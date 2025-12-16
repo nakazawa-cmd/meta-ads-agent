@@ -941,24 +941,6 @@ def show_dashboard(agent):
             </div>
             """, unsafe_allow_html=True)
     
-    st.divider()
-    
-    with col2:
-        st.subheader("✨ 機会")
-        opportunities = briefing.get("opportunities", [])
-        if opportunities:
-            for opp in opportunities:
-                st.markdown(f"""
-                <div class="opportunity-card">
-                    🟢 <strong>{opp.get('project')}</strong><br>
-                    {opp.get('message')}
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("特に目立った機会はありません")
-    
-    st.divider()
-    
     # サマリー
     summary = briefing.get("summary", {})
     st.subheader("📋 サマリー")
