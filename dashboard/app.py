@@ -22,58 +22,242 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# CSSスタイル
+# CSSスタイル - Shirofune風の洗練されたデザイン
 st.markdown("""
 <style>
+    /* ===== 全体のスタイル ===== */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+    }
+    
+    /* サイドバー */
+    [data-testid="stSidebar"] {
+        background-color: #FAFBFC;
+        border-right: 1px solid #E5E7EB;
+    }
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 2rem;
+    }
+    
+    /* ===== ヘッダー ===== */
     .main-header {
-        font-size: 2.5rem;
+        font-size: 1.75rem;
         font-weight: 700;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0;
+        color: #1C1E21;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
     }
     .sub-header {
-        color: #666;
-        font-size: 1rem;
+        color: #65676B;
+        font-size: 0.9rem;
         margin-top: 0;
+        font-weight: 400;
     }
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
+    
+    /* ===== KPIカード ===== */
+    .kpi-card {
+        background: #FFFFFF;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s ease;
     }
-    .status-good { color: #10B981; font-weight: bold; }
-    .status-warning { color: #F59E0B; font-weight: bold; }
-    .status-critical { color: #EF4444; font-weight: bold; }
+    .kpi-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1C1E21;
+        line-height: 1.2;
+    }
+    .kpi-label {
+        font-size: 0.85rem;
+        color: #65676B;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .kpi-change-positive {
+        color: #059669;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .kpi-change-negative {
+        color: #DC2626;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    /* ===== ステータスカード ===== */
+    .status-card {
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+    }
+    .status-card.success {
+        background: #ECFDF5;
+        border-left: 3px solid #059669;
+    }
+    .status-card.warning {
+        background: #FFFBEB;
+        border-left: 3px solid #D97706;
+    }
+    .status-card.error {
+        background: #FEF2F2;
+        border-left: 3px solid #DC2626;
+    }
+    .status-card.info {
+        background: #EFF6FF;
+        border-left: 3px solid #2563EB;
+    }
+    
+    /* ===== アクションボタン ===== */
+    .stButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.25rem;
+        transition: all 0.15s ease;
+    }
+    .stButton > button[kind="primary"] {
+        background: #1877F2;
+        border: none;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: #166FE5;
+        box-shadow: 0 2px 8px rgba(24,119,242,0.3);
+    }
+    
+    /* ===== テーブル ===== */
+    .dataframe {
+        border: none !important;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .dataframe th {
+        background: #F8F9FA !important;
+        font-weight: 600 !important;
+        color: #1C1E21 !important;
+        border-bottom: 1px solid #E5E7EB !important;
+    }
+    .dataframe td {
+        border-bottom: 1px solid #F3F4F6 !important;
+    }
+    
+    /* ===== セクション ===== */
+    .section-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1C1E21;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    
+    /* ===== 提案カード ===== */
     .recommendation-card {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-        margin: 10px 0;
+        background: #FFFFFF;
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px solid #E5E7EB;
+        margin-bottom: 1rem;
     }
+    .recommendation-card.high {
+        border-left: 4px solid #DC2626;
+    }
+    .recommendation-card.medium {
+        border-left: 4px solid #D97706;
+    }
+    .recommendation-card.low {
+        border-left: 4px solid #059669;
+    }
+    
+    /* ===== アラート ===== */
     .alert-critical {
-        background: #FEE2E2;
-        border-left: 4px solid #EF4444;
-        padding: 15px;
+        background: #FEF2F2;
+        border-left: 4px solid #DC2626;
+        padding: 1rem 1.25rem;
         border-radius: 8px;
-        margin: 10px 0;
+        margin: 0.75rem 0;
     }
     .alert-warning {
-        background: #FEF3C7;
-        border-left: 4px solid #F59E0B;
-        padding: 15px;
+        background: #FFFBEB;
+        border-left: 4px solid #D97706;
+        padding: 1rem 1.25rem;
         border-radius: 8px;
-        margin: 10px 0;
+        margin: 0.75rem 0;
     }
     .opportunity-card {
-        background: #D1FAE5;
-        border-left: 4px solid #10B981;
-        padding: 15px;
+        background: #ECFDF5;
+        border-left: 4px solid #059669;
+        padding: 1rem 1.25rem;
         border-radius: 8px;
-        margin: 10px 0;
+        margin: 0.75rem 0;
+    }
+    
+    /* ===== フォーム ===== */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > div,
+    .stNumberInput > div > div > input {
+        border-radius: 8px;
+        border: 1px solid #D1D5DB;
+    }
+    .stTextInput > div > div > input:focus,
+    .stSelectbox > div > div > div:focus {
+        border-color: #1877F2;
+        box-shadow: 0 0 0 3px rgba(24,119,242,0.1);
+    }
+    
+    /* ===== タブ ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        color: #65676B;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #1877F2;
+        border-bottom: 2px solid #1877F2;
+    }
+    
+    /* ===== メトリクス ===== */
+    [data-testid="stMetricValue"] {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1C1E21;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.85rem;
+        color: #65676B;
+        font-weight: 500;
+    }
+    
+    /* ===== Expander ===== */
+    .streamlit-expanderHeader {
+        font-weight: 600;
+        color: #1C1E21;
+        background: #F8F9FA;
+        border-radius: 8px;
+    }
+    
+    /* ===== 非表示にする要素 ===== */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    /* ===== レガシー互換 ===== */
+    .status-good { color: #059669; font-weight: 600; }
+    .status-warning { color: #D97706; font-weight: 600; }
+    .status-critical { color: #DC2626; font-weight: 600; }
+    .metric-card {
+        background: #FFFFFF;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #E5E7EB;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -119,7 +303,7 @@ def select_account_widget(agent):
         st.session_state.selected_account = list(account_options.values())[0]
     
     selected_name = st.selectbox(
-        "📊 広告アカウント",
+        "広告アカウント",
         options=list(account_options.keys()),
         index=list(account_options.values()).index(st.session_state.selected_account) if st.session_state.selected_account in account_options.values() else 0,
     )
@@ -130,8 +314,8 @@ def select_account_widget(agent):
 
 def main():
     # ヘッダー
-    st.markdown('<h1 class="main-header">🤖 Meta Ads AI Agent</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">人間のルールを超える総合判断</p>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Meta Ads Agent</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">広告運用の自動化・最適化ツール</p>', unsafe_allow_html=True)
     
     # サイドバー
     with st.sidebar:
@@ -139,7 +323,7 @@ def main():
         
         page = st.radio(
             "ページ選択",
-            ["📊 ダッシュボード", "🔍 キャンペーン分析", "📈 パターン学習", "📚 知識ベース", "🤖 自動運用", "📤 入稿"],
+            ["ダッシュボード", "キャンペーン分析", "パターン学習", "知識ベース", "自動運用", "入稿管理"],
             index=0,
         )
         
@@ -169,17 +353,17 @@ def main():
         st.caption("© 2024 Meta Ads AI Agent")
     
     # ページルーティング
-    if page == "📊 ダッシュボード":
+    if page == "ダッシュボード":
         show_dashboard(agent)
-    elif page == "🔍 キャンペーン分析":
+    elif page == "キャンペーン分析":
         show_campaign_analysis(agent)
-    elif page == "📈 パターン学習":
+    elif page == "パターン学習":
         show_pattern_learning(agent)
-    elif page == "📚 知識ベース":
+    elif page == "知識ベース":
         show_knowledge_base()
-    elif page == "🤖 自動運用":
+    elif page == "自動運用":
         show_automation(agent)
-    elif page == "📤 入稿":
+    elif page == "入稿管理":
         show_creative_management(agent)
 
 
