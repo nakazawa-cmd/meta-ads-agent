@@ -775,23 +775,24 @@ def show_creative_management(agent):
 
 
 def show_dashboard(agent):
-    """ダッシュボードページ"""
-    st.header("📊 パフォーマンスダッシュボード")
+    """ダッシュボードページ - Shirofune風デザイン"""
     
-    # 期間選択
-    col1, col2 = st.columns([2, 1])
-    with col1:
+    # ヘッダー部分
+    header_col1, header_col2 = st.columns([3, 1])
+    with header_col1:
+        st.markdown("### パフォーマンスダッシュボード")
+    with header_col2:
         date_range = st.selectbox(
-            "📅 期間選択",
-            ["今日", "昨日", "過去3日", "過去7日", "過去14日", "過去30日"],
-            index=3,  # デフォルトは過去7日
+            "期間",
+            ["今日", "昨日", "過去7日", "過去14日", "過去30日"],
+            index=2,
+            label_visibility="collapsed",
         )
     
     # 期間をdate_presetに変換
     date_preset_map = {
         "今日": "today",
         "昨日": "yesterday",
-        "過去3日": "last_3d",
         "過去7日": "last_7d",
         "過去14日": "last_14d",
         "過去30日": "last_30d",
@@ -811,70 +812,136 @@ def show_dashboard(agent):
     
     # デモモード表示
     if report.get("demo_mode"):
-        st.info("🎮 デモモードで動作中。実データを表示するにはMeta APIを接続してください。")
+        st.info("デモモードで動作中。実データを表示するにはMeta APIを接続してください。")
     
     # メトリクス
     current = report.get("current", {})
     previous = report.get("previous", {})
     
-    # 期間ラベル
-    period_label = date_range
+    # ===== Shirofune風KPIカード =====
+    spend_current = current.get("spend", 0)
+    spend_previous = previous.get("spend", 0)
+    spend_delta = ((spend_current - spend_previous) / spend_previous * 100) if spend_previous > 0 else 0
     
-    col1, col2, col3, col4, col5 = st.columns(5)
+    impressions_current = current.get("impressions", 0)
+    impressions_previous = previous.get("impressions", 0)
+    impressions_delta = ((impressions_current - impressions_previous) / impressions_previous * 100) if impressions_previous > 0 else 0
     
-    with col1:
-        spend_current = current.get("spend", 0)
-        spend_previous = previous.get("spend", 0)
-        delta = ((spend_current - spend_previous) / spend_previous * 100) if spend_previous > 0 else 0
-        st.metric("💰 消化", f"¥{spend_current:,.0f}", f"{delta:+.1f}%")
+    clicks_current = current.get("clicks", 0)
+    clicks_previous = previous.get("clicks", 0)
+    clicks_delta = ((clicks_current - clicks_previous) / clicks_previous * 100) if clicks_previous > 0 else 0
     
-    with col2:
-        cv_current = current.get("conversions", 0)
-        cv_previous = previous.get("conversions", 0)
-        delta = ((cv_current - cv_previous) / cv_previous * 100) if cv_previous > 0 else 0
-        st.metric("🎯 CV", f"{cv_current}件", f"{delta:+.1f}%")
+    cv_current = current.get("conversions", 0)
+    cv_previous = previous.get("conversions", 0)
+    cv_delta = ((cv_current - cv_previous) / cv_previous * 100) if cv_previous > 0 else 0
     
-    with col3:
-        ctr_current = current.get("ctr", 0)
-        ctr_previous = previous.get("ctr", 0)
-        delta = ((ctr_current - ctr_previous) / ctr_previous * 100) if ctr_previous > 0 else 0
-        st.metric("👆 CTR", f"{ctr_current:.2f}%", f"{delta:+.1f}%")
+    # KPIカードをHTMLで表示（Shirofune風）
+    st.markdown(f"""
+    <div style="display: flex; gap: 16px; margin: 24px 0;">
+        <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+            <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 8px;">利用金額</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1f2937;">¥{spend_current:,.0f}</div>
+            <div style="color: {'#059669' if spend_delta >= 0 else '#dc2626'}; font-size: 13px; margin-top: 4px;">
+                {'▲' if spend_delta >= 0 else '▼'} {abs(spend_delta):+.1f}%
+            </div>
+        </div>
+        <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+            <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 8px;">表示回数</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1f2937;">{impressions_current:,}</div>
+            <div style="color: {'#059669' if impressions_delta >= 0 else '#dc2626'}; font-size: 13px; margin-top: 4px;">
+                {'▲' if impressions_delta >= 0 else '▼'} {abs(impressions_delta):+.1f}%
+            </div>
+        </div>
+        <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+            <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 8px;">クリック数</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1f2937;">{clicks_current:,}</div>
+            <div style="color: {'#059669' if clicks_delta >= 0 else '#dc2626'}; font-size: 13px; margin-top: 4px;">
+                {'▲' if clicks_delta >= 0 else '▼'} {abs(clicks_delta):+.1f}%
+            </div>
+        </div>
+        <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+            <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 8px;">獲得数</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1f2937;">{cv_current}</div>
+            <div style="color: {'#059669' if cv_delta >= 0 else '#dc2626'}; font-size: 13px; margin-top: 4px;">
+                {'▲' if cv_delta >= 0 else '▼'} {abs(cv_delta):+.1f}%
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col4:
-        cpa_current = current.get("cpa", 0)
-        cpa_previous = previous.get("cpa", 0)
-        delta = ((cpa_current - cpa_previous) / cpa_previous * 100) if cpa_previous > 0 else 0
-        st.metric("📉 CPA", f"¥{cpa_current:,.0f}", f"{delta:+.1f}%", delta_color="inverse")
+    # メインコンテンツ（左）と改善提案（右）
+    main_col, side_col = st.columns([2, 1])
     
-    with col5:
-        roas_current = current.get("roas", 0)
-        roas_previous = previous.get("roas", 0)
-        delta = ((roas_current - roas_previous) / roas_previous * 100) if roas_previous > 0 else 0
-        st.metric("📈 ROAS", f"{roas_current:.2f}x", f"{delta:+.1f}%")
+    with main_col:
+        # グラフエリア
+        st.markdown("#### 推移グラフ")
+        
+        # 日別データがあればグラフ表示
+        daily_data = report.get("daily_data", [])
+        if daily_data:
+            import plotly.graph_objects as go
+            
+            dates = [d.get("date", "") for d in daily_data]
+            spends = [d.get("spend", 0) for d in daily_data]
+            
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=dates,
+                y=spends,
+                mode='lines+markers',
+                name='消化',
+                line=dict(color='#1877F2', width=2),
+                fill='tozeroy',
+                fillcolor='rgba(24, 119, 242, 0.1)',
+            ))
+            fig.update_layout(
+                margin=dict(l=0, r=0, t=10, b=0),
+                height=300,
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                xaxis=dict(showgrid=False),
+                yaxis=dict(showgrid=True, gridcolor='#f3f4f6'),
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("グラフデータがありません")
     
-    st.divider()
-    
-    # AIブリーフィング
-    briefing = report.get("ai_briefing", {})
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("🚨 アラート")
+    with side_col:
+        # 改善提案パネル（Shirofune風）
+        st.markdown("#### 改善チャンス")
+        
+        briefing = report.get("ai_briefing", {})
         alerts = briefing.get("alerts", [])
+        opportunities = briefing.get("opportunities", [])
+        
         if alerts:
-            for alert in alerts:
+            for i, alert in enumerate(alerts[:3]):
                 alert_type = alert.get("type", "warning")
-                css_class = "alert-critical" if alert_type == "critical" else "alert-warning"
-                icon = "🔴" if alert_type == "critical" else "🟡"
+                bg_color = "#fef2f2" if alert_type == "critical" else "#fffbeb"
+                border_color = "#dc2626" if alert_type == "critical" else "#d97706"
                 st.markdown(f"""
-                <div class="{css_class}">
-                    {icon} <strong>{alert.get('project')}</strong><br>
-                    {alert.get('message')}
+                <div style="background: {bg_color}; border-left: 3px solid {border_color}; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; font-size: 13px; color: #1f2937;">{alert.get('project', '')}</div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">{alert.get('message', '')}</div>
+                </div>
+                """, unsafe_allow_html=True)
+        elif opportunities:
+            for i, opp in enumerate(opportunities[:3]):
+                st.markdown(f"""
+                <div style="background: #ecfdf5; border-left: 3px solid #059669; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; font-size: 13px; color: #1f2937;">{opp.get('project', '')}</div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">{opp.get('message', '')}</div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.success("✅ アラートはありません")
+            st.markdown("""
+            <div style="background: #f0fdf4; border-left: 3px solid #22c55e; padding: 12px; border-radius: 6px;">
+                <div style="font-weight: 600; font-size: 13px; color: #166534;">問題なし</div>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">現在、改善が必要な項目はありません</div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    st.divider()
     
     with col2:
         st.subheader("✨ 機会")
@@ -1707,6 +1774,20 @@ def show_knowledge_base():
     
     # 統計
     stats = vs.get_collection_stats()
+    
+    # 知識ベースが空の場合、初期化ボタンを目立たせる
+    total_docs = sum(stats.values())
+    if total_docs == 0:
+        st.warning("⚠️ 知識ベースが空です。下のボタンで初期化してください。")
+        
+        if st.button("🚀 知識ベースを一括初期化（Meta公式 + 業界知見）", type="primary"):
+            with st.spinner("知識ベースを初期化中..."):
+                try:
+                    result = kb.initialize_knowledge()
+                    st.success(f"✅ 初期化完了: {result}")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ 初期化エラー: {e}")
     
     st.subheader("📊 コレクション統計")
     
