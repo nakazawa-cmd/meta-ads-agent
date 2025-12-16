@@ -1,0 +1,10 @@
+{
+  "_comment": "入稿プリセット設定",
+  "products": [],
+  "pages": [],
+  "default_settings": {
+    "daily_budget": 10000,
+    "auto_generate_texts": true
+  }
+}
+

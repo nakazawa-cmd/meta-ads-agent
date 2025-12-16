@@ -1,0 +1,17 @@
+{
+  "_comment": "キャンペーン別の目標値設定",
+  "_usage": "campaign_id をキーにして、target_cpf, target_cpa, target_roas などを設定",
+  "defaults": {
+    "traffic": {
+      "target_cpf": 50,
+      "cpf_warning": 100,
+      "cpf_critical": 200
+    },
+    "sales": {
+      "target_cpa": 5000,
+      "target_roas": 3.0
+    }
+  },
+  "campaigns": {}
+}
+

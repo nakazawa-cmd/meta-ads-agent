@@ -1,0 +1,15 @@
+{
+  "_comment": "監視設定",
+  "enabled_accounts": [],
+  "schedule": {
+    "check_interval_minutes": 60,
+    "daily_report_hour": 9,
+    "daily_report_minute": 0
+  },
+  "notifications": {
+    "send_hourly_alerts": true,
+    "send_daily_report": true,
+    "alert_severity_threshold": "medium"
+  }
+}
+
